@@ -13,7 +13,7 @@ gd_omap* gd_omap_init(size_t capacity) {
     return t;
 }
 
-gd_omap_bucket* gd_omap_init_bucket(gd__omap_keyT key, void* value) {
+gd_omap_bucket* gd_omap_init_bucket(gd__omap_keyT key, gd__omap_valueT value) {
     gd_omap_bucket* b = (gd_omap_bucket*)malloc(sizeof(gd_omap_bucket));
     b->key = key;
     b->value = value;
@@ -23,7 +23,7 @@ gd_omap_bucket* gd_omap_init_bucket(gd__omap_keyT key, void* value) {
 void gd_omap_free(gd_omap* m, void (*callback)(void* value)) {
     gd_dll_node* n = m->bucket_list->head;
     for (; n; n = n->next) {
-        callback(((gd_omap_bucket*)n->value)->value);
+        callback((void*)((gd_omap_bucket*)n->value)->value);
         free((gd_omap_bucket*)n->value);
     }
     gd_dll_cleanup(m->bucket_list, NULL);
@@ -73,7 +73,7 @@ void gd_omap_resize(gd_omap* m) {
     }
 }
 
-void gd_omap_add(gd_omap* m, gd__omap_keyT key, void* value) {
+void gd_omap_add(gd_omap* m, gd__omap_keyT key, gd__omap_valueT value) {
     if (m->size >= (m->capacity >> 1)) {
         gd_omap_resize(m);
     }
@@ -84,14 +84,14 @@ void gd_omap_add(gd_omap* m, gd__omap_keyT key, void* value) {
     m->size++;
 }
 
-void* gd_omap_get(gd_omap* m, gd__omap_keyT key) {
+gd__omap_valueT gd_omap_get(gd_omap* m, gd__omap_keyT key) {
     size_t target_index = gd__omap_hash_function(m, key);
     size_t i = target_index;
     size_t max = m->capacity;
     probe:
     for (gd_omap_bucket* b; (b = m->buckets[i]) && i < max; i++) {
         if (!b) {
-            return NULL;
+            return (gd__omap_valueT)NULL;
         }
         if (b->key == key) {
             return b->value;
@@ -102,7 +102,7 @@ void* gd_omap_get(gd_omap* m, gd__omap_keyT key) {
         max = target_index;
         goto probe;
     }
-    return NULL;
+    return (gd__omap_valueT)NULL;
 }
 
 
