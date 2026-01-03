@@ -1,6 +1,6 @@
 #include "gd-trie.h"
 
-#define SUBTREES_LEN 126
+#define SUBTREES_LEN 128
 
 typedef struct gd__trie_nodeT gd_trie_node;
 struct gd__trie_nodeT {
