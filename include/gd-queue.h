@@ -1,6 +1,8 @@
 #ifndef GD_QUEUE_H
 #define GD_QUEUE_H
 
+#include <stddef.h>
+
 #ifndef GD_Q_NODE_T
 #define GD_Q_NODE_T
 typedef int gd_q_nodeT;
@@ -21,9 +23,9 @@ struct gd_q {
  *  -1 on failure
  * @param q Pointer to queue
  * @param buffer Pointer to allocated queue memory
- * @param size Number of available integer positions in buffer
+ * @param size Size of buffer
  */
-int gd_q_init(struct gd_q *q, gd_q_nodeT *buffer, int size);
+int gd_q_init(struct gd_q *q, gd_q_nodeT *buffer, size_t size);
 
 /**
  * @brief Adds one element to rear of queue
@@ -55,10 +57,10 @@ int gd_q_dequeue(struct gd_q *q, gd_q_nodeT *val);
  *  -2 if new buffer overlaps with old buffer
  *  Other negative value on failure
  * @param q Pointer to queue
- * @param new_buffer Pointer to allocated memory
- * @param new_capacity Size of newly allocated memory
+ * @param new_buffer Pointer to newly allocated memory
+ * @param new_size Size of newly allocated buffer
  * @warning Not for use with overlapping buffers
  */
-int gd_q_resize(struct gd_q *q, gd_q_nodeT *new_buffer, int new_capacity);
+int gd_q_resize(struct gd_q *q, gd_q_nodeT *new_buffer, size_t new_size);
 
 #endif // GD_QUEUE_H

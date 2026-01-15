@@ -10,7 +10,7 @@ void tearDown(void) {
 void gdQueueTest_gdQInit_shouldInitializeEmptyQueue(void) {
     struct gd_q q;
     int buffer[16];
-    int err = gd_q_init(&q, buffer, sizeof(buffer) / sizeof(int));
+    int err = gd_q_init(&q, buffer, sizeof(buffer));
     TEST_ASSERT_EQUAL(0, err);
     TEST_ASSERT_EQUAL(16, q.capacity);
     TEST_ASSERT_EQUAL(0, q.front);
@@ -21,7 +21,7 @@ void gdQueueTest_gdQInit_shouldInitializeEmptyQueue(void) {
 void gdQueueTest_gdQEnqueue_shouldAddElement(void) {
     struct gd_q q;
     int buffer[16];
-    int err = gd_q_init(&q, buffer, sizeof(buffer) / sizeof(int));
+    int err = gd_q_init(&q, buffer, sizeof(buffer));
     TEST_ASSERT_EQUAL(0, err);
 
     err = gd_q_enqueue(&q, 2);
@@ -46,7 +46,7 @@ void gdQueueTest_gdQEnqueue_shouldAddElement(void) {
 void gdQueueTest_gdQEnqueue_shouldReturnNegativeWhenFull(void) {
     struct gd_q q;
     int buffer[4];
-    int err = gd_q_init(&q, buffer, sizeof(buffer) / sizeof(int));
+    int err = gd_q_init(&q, buffer, sizeof(buffer));
     TEST_ASSERT_EQUAL(0, err);
 
     err = gd_q_enqueue(&q, 2);
@@ -70,7 +70,7 @@ void gdQueueTest_gdQEnqueue_shouldReturnNegativeWhenFull(void) {
 void gdQueueTest_gdQDequeue_shouldRemoveAndSetValue(void) {
     struct gd_q q;
     int buffer[8];
-    int err = gd_q_init(&q, buffer, sizeof(buffer) / sizeof(int));
+    int err = gd_q_init(&q, buffer, sizeof(buffer));
     TEST_ASSERT_EQUAL(0, err);
 
     err = gd_q_enqueue(&q, 2);
@@ -107,7 +107,7 @@ void gdQueueTest_gdQDequeue_shouldRemoveAndSetValue(void) {
 void gdQueueTest_gdQBuffer_shouldWrapAround(void) {
     struct gd_q q;
     int buffer[4];
-    int err = gd_q_init(&q, buffer, sizeof(buffer) / sizeof(int));
+    int err = gd_q_init(&q, buffer, sizeof(buffer));
     TEST_ASSERT_EQUAL(0, err);
 
     int val;
@@ -148,7 +148,7 @@ void gdQueueTest_gdQBuffer_shouldWrapAround(void) {
 void gdQueueTest_gdQResize_shouldMaintainInsertionOrder(void) {
     struct gd_q q;
     int buffer[4];
-    int err = gd_q_init(&q, buffer, sizeof(buffer) / sizeof(int));
+    int err = gd_q_init(&q, buffer, sizeof(buffer));
     TEST_ASSERT_EQUAL(0, err);
 
     err = gd_q_enqueue(&q, 2);
@@ -161,7 +161,7 @@ void gdQueueTest_gdQResize_shouldMaintainInsertionOrder(void) {
     TEST_ASSERT_EQUAL(2, val);
 
     int new_buffer[8];
-    err = gd_q_resize(&q, new_buffer, sizeof(new_buffer) / sizeof(int));
+    err = gd_q_resize(&q, new_buffer, sizeof(new_buffer));
     TEST_ASSERT_EQUAL(3, new_buffer[0]);
     TEST_ASSERT_EQUAL(0, q.front);
     TEST_ASSERT_EQUAL(2, q.length);

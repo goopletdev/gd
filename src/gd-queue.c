@@ -1,11 +1,11 @@
 #include "gd-queue.h"
 
-int gd_q_init(struct gd_q *q, gd_q_nodeT *buffer, int size) {
+int gd_q_init(struct gd_q *q, gd_q_nodeT *buffer, size_t size) {
     if (size < 1) {
         return -1;
     }
     q->buffer = buffer;
-    q->capacity = size;
+    q->capacity = (int)(size / sizeof(gd_q_nodeT));
     q->front = 0;
     q->rear = 0;
     q->length = 0;
@@ -34,7 +34,8 @@ int gd_q_dequeue(struct gd_q *q, gd_q_nodeT *val) {
     return 0;
 }
 
-int gd_q_resize(struct gd_q *q, gd_q_nodeT *new_buffer, int new_capacity) {
+int gd_q_resize(struct gd_q *q, gd_q_nodeT *new_buffer, size_t new_size) {
+    int new_capacity = (int)(new_size / sizeof(gd_q_nodeT));
     if (new_capacity < q->length) {
         return -1;
     }
@@ -47,7 +48,7 @@ int gd_q_resize(struct gd_q *q, gd_q_nodeT *new_buffer, int new_capacity) {
     }
 
     struct gd_q new_q;
-    int err = gd_q_init(&new_q, new_buffer, new_capacity);
+    int err = gd_q_init(&new_q, new_buffer, new_size);
 
     if (err < 0) {
         return err;
