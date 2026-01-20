@@ -1,36 +1,76 @@
 #include "gd-arena.h"
 
-void* gd_arena_malloc(struct gd_arena *a, size_t size) {
-    if ((a->next + size) > a->size) {
-        a->err = GDERR_A_INSUFFICIENT_SPACE;
-        return NULL;
-    }
-    void* ptr = a->buffer + a->next;
-    a->next += size;
-    return ptr;
-}
-
-struct gd_arena gd_arena_new(uint8_t *buffer, size_t size) {
-    struct gd_arena a = { buffer, size, 0, GDERR_A_OK };
+int gd_arena_new(struct gd_arena *a, uint8_t *buffer, size_t size) {
     if (size < 1) {
-        a.buffer = NULL;
-        a.size = 0;
-        a.err = GDERR_A_INAPPROPRIATE_BUFFER_SIZE;
+        return -1;
     }
-    return a;
+    struct gd_arena arena = { 
+        buffer, 
+        buffer + size - 1, 
+        buffer,
+        buffer
+    };
+    *a = arena;
+    return 0;
 }
 
-struct gd_string gd_arena_str(struct gd_arena *a, char *s, size_t len) {
-    struct gd_string gs;
-    if ((gs.str = (char*)gd_arena_malloc(a, len)) == NULL) {
-        gs.length = 0;
-        return gs;
+int gd_arena_alloc(struct gd_arena *a, size_t size) {
+    struct gd_arena arena = *a;
+    arena.current = arena.next;
+    if (arena.current == (arena.max + 1)) {
+        return -2;
     }
-    gs.length = len;
-    for (int i = 0; i < len; i++) {
-        gs.str[i] = s[i];
+    arena.next += size;
+    if (arena.next > (arena.max + 1)) {
+        return -1;
     }
-    return gs;
+    *a = arena;
+    return 0;
 }
 
+int gd_arena_realloc_current(struct gd_arena *a, size_t new_size) {
+    struct gd_arena arena = *a;
+    arena.next = arena.current + new_size;
+    if (arena.next > (arena.max + 1)) {
+        return -1;
+    }
+    *a = arena;
+    return 0;
+} 
 
+int gd_arena_appendc(struct gd_arena *a, uint8_t c) {
+    if (a->next > a->max) {
+        return -2;
+    }
+    *(a->next++) = c;
+    return 0;
+}
+
+int gd_arena_appends(struct gd_arena *a, void *ptr, size_t s) {
+    if ((a->next + s) > (a->max + 1)) {
+        return -1;
+    }
+    memcpy(a->next, ptr, s);
+    a->next += s;
+    return 0;
+}
+
+int gd_arena_read_last_pointer(struct gd_arena *a, struct gd_pointer *p) {
+    size_t size = (size_t)(a->next - a->current);
+    if (size == 0) {
+        return -1;
+    }
+    p->buffer = a->current;
+    p->size = size;
+    return 0;
+}
+
+int gd_arena_read_last_string(struct gd_arena *a, struct gd_string *s) {
+    size_t size = (size_t)(a->next - a->current);
+    if (size == 0) {
+        return -1;
+    }
+    s->str = a->current;
+    s->length = size;
+    return 0;
+}
