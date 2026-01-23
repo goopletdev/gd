@@ -38,6 +38,10 @@ int gd_parse_csv_headers(const char *headers_line, struct gd_csv *csv, struct gd
     return 1;
 }
 
+int gd_parse_csv_line(const char *headers_line, struct gd_csv *csv, struct gd_arena *char_arena, struct gd_arena *str_arena) {
+    return 1;
+}
+
 int gd_parse_csv(const char* file_path, struct gd_csv *csv, struct gd_arena *char_arena, struct gd_arena *str_arena) {
     return 1;
 }

@@ -47,6 +47,7 @@ int main(void) {
     UNITY_BEGIN();
 
     RUN_TEST(gdParse_escapedAscii_shouldReturnUnescapedAscii);
+    RUN_TEST(gdParse_csvHeaders_shouldGetNumColumns);
     RUN_TEST(gdParse_csv_shouldParseCsv);
 
     return UNITY_END();
