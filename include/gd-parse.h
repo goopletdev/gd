@@ -11,6 +11,10 @@
 #define GD_PARSE_MAX_CSV_COLUMNS 64
 #endif // GD_PARSE_MAX_CSV_COLUMNS
 
+#ifndef GD_PARSE_CSV_DELIMITER
+#define GD_PARSE_CSV_DELIMITER ','
+#endif // GD_PARSE_CSV_DELIMITER
+
 struct gd_csv {
     size_t cols;
     size_t rows;
