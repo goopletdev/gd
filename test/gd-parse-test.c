@@ -29,14 +29,52 @@ void gdParse_escapedAscii_shouldReturnUnescapedAscii(void) {
 
 void gdParse_csvHeaders_shouldGetNumColumns(void) {
     struct gd_csv csv;
-    int err = gd_parse_csv_headers("alpha,bravo,charlie,delta,echo", &csv, &char_arena, &str_arena);
+    csv.char_arena = &char_arena;
+    csv.str_arena = &str_arena;
+    
+    int err = gd_parse_csv_headers("alpha,bravo,charlie,delta,echo", &csv);
     TEST_ASSERT_EQUAL(0, err);
     TEST_ASSERT_EQUAL(5, csv.cols);
-    TEST_ASSERT_EQUAL_CHAR_ARRAY("alpha", csv.headers[0].str, csv.headers[0].length);
-    TEST_ASSERT_EQUAL_CHAR_ARRAY("bravo", csv.headers[1].str, csv.headers[1].length);
-    TEST_ASSERT_EQUAL_CHAR_ARRAY("charlie", csv.headers[2].str, csv.headers[2].length);
-    TEST_ASSERT_EQUAL_CHAR_ARRAY("delta", csv.headers[3].str, csv.headers[3].length);
-    TEST_ASSERT_EQUAL_CHAR_ARRAY("echo", csv.headers[4].str, csv.headers[4].length);
+    TEST_ASSERT_EQUAL_CHAR_ARRAY("alpha", csv.entries[0].str, csv.entries[0].length);
+    TEST_ASSERT_EQUAL_CHAR_ARRAY("bravo", csv.entries[1].str, csv.entries[1].length);
+    TEST_ASSERT_EQUAL_CHAR_ARRAY("charlie", csv.entries[2].str, csv.entries[2].length);
+    TEST_ASSERT_EQUAL_CHAR_ARRAY("delta", csv.entries[3].str, csv.entries[3].length);
+    TEST_ASSERT_EQUAL_CHAR_ARRAY("echo", csv.entries[4].str, csv.entries[4].length);
+}
+
+void gdParse_csvLine_shouldConformToHeaders(void) {
+    struct gd_csv csv;
+    csv.char_arena = &char_arena;
+    csv.str_arena = &str_arena;
+    
+    int err = gd_parse_csv_headers("alpha,bravo,charlie,delta,echo", &csv);
+    TEST_ASSERT_EQUAL(0, err);
+
+    printf("Begin parse first line\n");
+
+    err = gd_parse_csv_line("Ainur,Belerand,Celeborn,Dolkien,Ea", &csv);
+    TEST_ASSERT_EQUAL(0, err);
+    printf("access line col 0:\n");
+    TEST_ASSERT_EQUAL_CHAR_ARRAY("Ainur", csv.entries[0].str, csv.entries[0].length);
+    printf("access line col 1:\n");
+    TEST_ASSERT_EQUAL_CHAR_ARRAY("Belerand", csv.entries[1].str, csv.entries[1].length);
+    printf("access line col 2:\n");
+    TEST_ASSERT_EQUAL_CHAR_ARRAY("Celeborn", csv.entries[2].str, csv.entries[2].length);
+    printf("access line col 3:\n");
+    TEST_ASSERT_EQUAL_CHAR_ARRAY("Dolkien", csv.entries[3].str, csv.entries[3].length);
+    printf("access line col 4:\n");
+    TEST_ASSERT_EQUAL_CHAR_ARRAY("Ea", csv.entries[4].str, csv.entries[4].length);
+
+    printf("parse disallowed line length:\n");
+    err = gd_parse_csv_line("Ainur,Belerand,Celeborn,Dolkien,Ea,Faramir", &csv);
+    TEST_ASSERT_EQUAL(-2, err);
+
+    printf("parse disallowed line length:\n");
+    err = gd_parse_csv_line("Ainur,Belerand,Celeborn,Dolkien", &csv);
+    TEST_ASSERT_EQUAL(-1, err);
+
+    TEST_ASSERT_EQUAL(5, csv.cols);
+    TEST_ASSERT_EQUAL(1, csv.rows);
 }
 
 void gdParse_csv_shouldParseCsv(void) {
@@ -48,6 +86,7 @@ int main(void) {
 
     RUN_TEST(gdParse_escapedAscii_shouldReturnUnescapedAscii);
     RUN_TEST(gdParse_csvHeaders_shouldGetNumColumns);
+    RUN_TEST(gdParse_csvLine_shouldConformToHeaders);
     RUN_TEST(gdParse_csv_shouldParseCsv);
 
     return UNITY_END();

@@ -14,12 +14,11 @@ char gd_get_escaped_ascii(char c) {
     }
 }
 
-int gd_parse_csv_headers(const char *headers_line, struct gd_csv *csv, struct gd_arena *char_arena, struct gd_arena *str_arena) {
+int gd_parse_csv_headers(const char *headers_line, struct gd_arena *char_arena, struct gd_arena *str_arena) {
     int err;
     int escaped = 0;
     int cols = 0;
     char c;
-    struct gd_string s;
     for (int i = 0;; i++) {
         c = headers_line[i];
         if (escaped) {
@@ -37,15 +36,16 @@ int gd_parse_csv_headers(const char *headers_line, struct gd_csv *csv, struct gd
             if (err = gd_arena_appendc(char_arena, c)) return err;
         }
     }
-    struct gd_pointer p;
+    struct gd_string p;
     if (err = gd_arena_read_last_pointer(str_arena, &p)) return err;
     csv->cols = cols;
-    csv->headers = (struct gd_string*)p.buffer;
+    if (err = gd_arena_appends(entries_arena, &p, sizeof(p))) return err;
+    csv->entries = (struct gd_pointer*)entries_arena->buffer;
 
     return 0;
 }
 
-int gd_parse_csv_line(const char *headers_line, struct gd_csv *csv, struct gd_arena *char_arena, struct gd_arena *str_arena) {
+int gd_parse_csv_line(const char *line, struct gd_csv *csv) {
     return 1;
 }
 
