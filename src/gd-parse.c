@@ -14,42 +14,61 @@ char gd_get_escaped_ascii(char c) {
     }
 }
 
-int gd_parse_csv_headers(const char *headers_line, struct gd_arena *char_arena, struct gd_arena *str_arena) {
+int gd_parse_csv_line(const char *line, struct gd_arena *char_arena, struct gd_arena *str_arena) {
     int err;
     int escaped = 0;
     int cols = 0;
     char c;
+    struct gd_string s;
     for (int i = 0;; i++) {
-        c = headers_line[i];
+        c = line[i];
         if (escaped) {
             escaped = 0;
-            if (err = gd_arena_appendc(char_arena, gd_get_escaped_ascii(c))) return err;
+            if ((err = gd_arena_appendc(char_arena, gd_get_escaped_ascii(c)))) return err;
         } else if (c == '\\') {
             escaped = 1;
         } else if (c == GD_PARSE_CSV_DELIMITER || c == '\n' || c == '\0') {
             cols++;
-            if (err = gd_arena_read_last_string(char_arena, &s)) return err;
-            if (err = gd_arena_alloc(char_arena, 0)) return err;
-            if (err = gd_arena_appends(str_arena, &s, sizeof(s))) return err;
+            if ((err = gd_arena_read_last_string(char_arena, &s))) return err;
+            if ((err = gd_arena_alloc(char_arena, 0))) return err;
+            if ((err = gd_arena_appends(str_arena, &s, sizeof(s)))) return err;
             if (c == '\n' || c == '\0') break;
         } else {
-            if (err = gd_arena_appendc(char_arena, c)) return err;
+            if ((err = gd_arena_appendc(char_arena, c))) return err;
         }
     }
-    struct gd_string p;
-    if (err = gd_arena_read_last_pointer(str_arena, &p)) return err;
-    csv->cols = cols;
-    if (err = gd_arena_appends(entries_arena, &p, sizeof(p))) return err;
-    csv->entries = (struct gd_pointer*)entries_arena->buffer;
 
-    return 0;
-}
-
-int gd_parse_csv_line(const char *line, struct gd_csv *csv) {
-    return 1;
+    return cols;
 }
 
 int gd_parse_csv(const char* file_path, struct gd_csv *csv, struct gd_arena *char_arena, struct gd_arena *str_arena) {
-    return 1;
+    FILE *fp = fopen(file_path, "r");
+    if (fp == NULL) {
+        return -1;
+    }
+
+    char line_buffer[GD_PARSE_MAX_LINE_WIDTH];
+
+    // parse header line for number columns
+    if (!fgets(line_buffer, GD_PARSE_MAX_LINE_WIDTH, fp)) {
+        return -1; // zero lines
+    }
+    int cols = gd_parse_csv_line(line_buffer, char_arena, str_arena);
+    if (cols < 1) {
+        return -1;
+    }
+    csv->cols = cols;
+    csv->rows = 1;
+    csv->entries = (struct gd_string*)str_arena->buffer;
+
+    while (fgets(line_buffer, GD_PARSE_MAX_LINE_WIDTH, fp)) {
+        cols = gd_parse_csv_line(line_buffer, char_arena, str_arena);
+        if (cols != csv->cols) {
+            return -1;
+        }
+        csv->rows++;
+    }
+
+    return 0;
 }
 
