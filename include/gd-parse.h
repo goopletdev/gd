@@ -43,7 +43,13 @@ int gd_parse_csv_line(const char *line, struct gd_arena *char_arena, struct gd_a
  * parses .csv file into *csv and its associated arenas
  * @return
  *  0: success
- *  negative value: failure
+ *  -1: error opening file
+ *  -2: no lines in file
+ *  -3: zero cols in header
+ *  -4: other error in header parsing
+ *  -5: zero cols in line
+ *  other negative value: error in gd_parse_csv_line minus 5
+ *  positive value: wrong number of cols in line
  */
 int gd_parse_csv(const char* file_path, struct gd_csv *csv, struct gd_arena *char_arena, struct gd_arena *str_arena);
 

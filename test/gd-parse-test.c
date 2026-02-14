@@ -1,7 +1,7 @@
 #include "gd-parse.h"
 #include "unity.h"
 
-char fpath[] = "./test/test-data/CSV1.csv";
+const char fpath[] = "test/test-data/CSV1.csv";
 
 struct gd_arena char_arena;
 struct gd_arena str_arena;
@@ -52,7 +52,7 @@ void gdParse_csv_shouldParseCsv(void) {
     TEST_ASSERT_EQUAL(6, csv.cols);
     TEST_ASSERT_EQUAL(3, csv.rows);
 
-    TEST_ASSERT_EQUAL_CHAR_ARRAY("charlie", csv.entries[0].str, csv.entries[0].length);
+    TEST_ASSERT_EQUAL_CHAR_ARRAY("alpha", csv.entries[0].str, csv.entries[0].length);
     TEST_ASSERT_EQUAL_CHAR_ARRAY("foxtrot", csv.entries[5].str, csv.entries[5].length);
 
     int line = 1, col = 0;
@@ -64,7 +64,7 @@ void gdParse_csv_shouldParseCsv(void) {
     TEST_ASSERT_EQUAL_CHAR_ARRAY("column 2 (index 1)", csv.entries[pos].str, csv.entries[pos].length);
 
     pos++;
-    TEST_ASSERT_EQUAL_CHAR_ARRAY("", csv.entries[pos].str, csv.entries[pos].length);
+    TEST_ASSERT_NULL(csv.entries[pos].str);
 
     pos++;
     TEST_ASSERT_EQUAL_CHAR_ARRAY("previous was blank", csv.entries[pos].str, csv.entries[pos].length);

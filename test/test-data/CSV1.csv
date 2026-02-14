@@ -1,3 +1,3 @@
 alpha,bravo,charlie,delta,echo,foxtrot
 line1,col1,col2,col3,col4,col5
-line2,column 2 (index 1),,previous was blank,column 5 (index 4), column 6 (index 5)
+line2,column 2 (index 1),,previous was blank,column 5 (index 4),column 6 (index 5)

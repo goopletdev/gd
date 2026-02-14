@@ -51,11 +51,12 @@ int gd_parse_csv(const char* file_path, struct gd_csv *csv, struct gd_arena *cha
 
     // parse header line for number columns
     if (!fgets(line_buffer, GD_PARSE_MAX_LINE_WIDTH, fp)) {
-        return -1; // zero lines
+        return -2; // zero lines
     }
     int cols = gd_parse_csv_line(line_buffer, char_arena, str_arena);
     if (cols < 1) {
-        return -1;
+        if (cols == 0) return -3;
+        return -4;
     }
     csv->cols = cols;
     csv->rows = 1;
@@ -64,7 +65,8 @@ int gd_parse_csv(const char* file_path, struct gd_csv *csv, struct gd_arena *cha
     while (fgets(line_buffer, GD_PARSE_MAX_LINE_WIDTH, fp)) {
         cols = gd_parse_csv_line(line_buffer, char_arena, str_arena);
         if (cols != csv->cols) {
-            return -1;
+            if (cols > 0) return cols;
+            return cols - 5;
         }
         csv->rows++;
     }
