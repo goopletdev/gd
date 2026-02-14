@@ -53,6 +53,4 @@ int gd_parse_csv_line(const char *line, struct gd_arena *char_arena, struct gd_a
  */
 int gd_parse_csv(const char* file_path, struct gd_csv *csv, struct gd_arena *char_arena, struct gd_arena *str_arena);
 
-int get_parse_csv_get_row_col(struct gd_csv *csv, int row, int col);
-
 #endif // GD_PARSE_H

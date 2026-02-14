@@ -2,4 +2,4 @@
 Collection of C data structures
 
 ## todo:
-rewrite gd-dll to take uintptr_t 
+add tests for error values in `gd_parse_csv`

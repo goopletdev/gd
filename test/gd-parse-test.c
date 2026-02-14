@@ -70,12 +70,17 @@ void gdParse_csv_shouldParseCsv(void) {
     TEST_ASSERT_EQUAL_CHAR_ARRAY("previous was blank", csv.entries[pos].str, csv.entries[pos].length);
 }
 
+void gdParse_csvGetRowCol_shouldGetEntryCol(void) {
+    TEST_IGNORE_MESSAGE("write csvGetRowCol test");
+}
+
 int main(void) {
     UNITY_BEGIN();
 
     RUN_TEST(gdParse_escapedAscii_shouldReturnUnescapedAscii);
     RUN_TEST(gdParse_csvLine_shouldGetNumColumns);
     RUN_TEST(gdParse_csv_shouldParseCsv);
+    RUN_TEST(gdParse_csvGetRowCol_shouldGetEntryCol);
 
     return UNITY_END();
 }
