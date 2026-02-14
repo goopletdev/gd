@@ -75,9 +75,9 @@ int gd_arena_read_last_pointer(struct gd_arena *a, struct gd_pointer *p);
 
 /**
  * reads a->current and (a->next - a->current) into s
+ * can write 0-size strings as well, but will return a gd_str w/ null pointer
  * @return
  *  0 on success
- *  -1 if pointer had size 0, and does not write to p
  */
 int gd_arena_read_last_string(struct gd_arena *a, struct gd_string *s);
 

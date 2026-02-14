@@ -68,9 +68,12 @@ int gd_arena_read_last_pointer(struct gd_arena *a, struct gd_pointer *p) {
 int gd_arena_read_last_string(struct gd_arena *a, struct gd_string *s) {
     size_t size = (size_t)(a->next - a->current);
     if (size == 0) {
-        return -1;
+        s->str = NULL;
+        s->length = 0;
+    } else {
+        s->str = a->current;
+        s->length = size;
     }
-    s->str = a->current;
-    s->length = size;
+
     return 0;
 }
