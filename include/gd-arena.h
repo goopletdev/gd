@@ -17,9 +17,10 @@ struct gd_string {
 
 struct gd_arena {
     uint8_t *buffer;
-    uint8_t *max;
-    uint8_t *current;
-    uint8_t *next;
+    size_t size;
+    size_t max;
+    size_t current;
+    size_t next;
 };
 
 /**
@@ -32,8 +33,7 @@ int gd_arena_new(struct gd_arena *a, uint8_t *buffer, size_t size);
 
 /**
  * sets a->current to a->next, and increments a->next by size
- * notably, size can be 0, 
- * but this will cause gd_arena_read_last_pointer to fail
+ * notably, size can be 0, which should only be used with appendc and appends
  * @return 
  *  0 on success
  *  -1 if insufficient space in arena for new allocation
