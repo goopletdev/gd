@@ -79,3 +79,51 @@ void gd_trie_insert_ci(gd_trie* root, const char* key, const void* value) {
     }
     current->value = value;
 }
+
+const void* gd_trie_get_ci_from_cs(gd_trie* root, const char* key) {
+    char c = *(key++);
+    if (!c) {
+        return root->value;
+    }
+    gd_trie* current = root->subtrees[(int)c];
+    if (!current) {
+        if (c >= 'A' && c <= 'Z') {
+            current = root->subtrees[c + 32];
+            if (!current) {
+                return NULL;
+            } else {
+                return gd_trie_get_ci_from_cs(current, key);
+            }
+        } else if (c >= 'a' && c <= 'z') {
+            current = root->subtrees[c - 32];
+            if (!current) {
+                return NULL;
+            } else {
+                return gd_trie_get_ci_from_cs(current, key);
+            }
+        } else {
+            return NULL;
+        }
+    }
+    const void* value = gd_trie_get_ci_from_cs(current, key);
+    if (value) {
+        return value;
+    } else if (c >= 'A' && c <= 'Z') {
+        current = root->subtrees[c + 32];
+        if (!current) {
+            return NULL;
+        } else {
+            return gd_trie_get_ci_from_cs(current, key);
+        }
+    } else if (c >= 'a' && c <= 'z') {
+        current = root->subtrees[c - 32];
+        if (!current) {
+            return NULL;
+        } else {
+            return gd_trie_get_ci_from_cs(current, key);
+        }
+    } else {
+        return NULL;
+    }
+}
+

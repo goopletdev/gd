@@ -7,17 +7,6 @@
 /**
  * Trie data structure
  */
-struct gd_trie {
-    gd_pointer value;
-    gd_pointer nodes; // if uninitialized, nodes is null
-    /**
-     * also relevant:
-     *  size_t nodes_len
-     *  struct gd_arena nodes_arena
-     *  maybe a value_arena, and store indexes rather than pointers for value?
-     */
-};
-
 typedef struct gd__trie_nodeT gd_trie;
 
 /**

@@ -6,7 +6,7 @@
 #include <string.h>
 
 struct gd_pointer {
-    uint8_t *buffer;
+    size_t index; // previously pointer
     size_t size;
 };
 
