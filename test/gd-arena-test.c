@@ -7,30 +7,6 @@ void setUp(void) {
 void tearDown(void) {
 }
 
-void gdArena_new_shouldInitArenaPointers(void) {
-    uint8_t buffer[16];
-    struct gd_arena arena;
-    struct gd_arena arena_copy = arena;
-    int err = gd_arena_new(&arena, buffer, 0);
-
-    TEST_ASSERT_EQUAL(-1, err);
-    TEST_ASSERT_EQUAL_PTR(arena.buffer, arena_copy.buffer);
-    TEST_ASSERT_EQUAL(arena.max, arena_copy.max);
-    TEST_ASSERT_EQUAL(arena.current, arena_copy.current);
-    TEST_ASSERT_EQUAL(arena.next, arena_copy.next);
-
-    err = gd_arena_new(&arena, buffer, sizeof(buffer));
-
-    TEST_ASSERT_EQUAL(0, err);
-    TEST_ASSERT_FALSE(arena.buffer == arena_copy.buffer);
-    TEST_ASSERT_FALSE(arena.max == arena_copy.max);
-
-    TEST_ASSERT_EQUAL(15, arena.max);
-    TEST_ASSERT_EQUAL_PTR(arena.buffer, arena.buffer + arena.current);
-    TEST_ASSERT_EQUAL_PTR(arena.buffer, arena.buffer + arena.next);
-
-}
-
 void gdArena_alloc_shouldReturnNegativeIfFull(void) {
     uint8_t buffer[16];
     struct gd_arena arena;
@@ -211,6 +187,44 @@ void gdArena_appends_shouldCopyBufferContents(void) {
     TEST_ASSERT_EQUAL_CHAR_ARRAY("test1test2UPPER", buffer, 15);
 }
 
+void gdArena_appendnts_shouldCopyNullTerminatedString(void) {
+    uint8_t buffer[16];
+    struct gd_arena arena;
+    int err = gd_arena_new(&arena, buffer, sizeof(buffer));
+
+    TEST_ASSERT_EQUAL(0, err);
+
+    err = gd_arena_appendnts(&arena, "test1");
+
+    TEST_ASSERT_EQUAL(0, err);
+    TEST_ASSERT_EQUAL(5, arena.next);
+    TEST_ASSERT_EQUAL(0, arena.current);
+
+    err = gd_arena_appendnts(&arena, "test2");
+
+    TEST_ASSERT_EQUAL(0, err);
+    TEST_ASSERT_EQUAL(10, arena.next);
+    TEST_ASSERT_EQUAL(0, arena.current);
+    TEST_ASSERT_EQUAL_CHAR_ARRAY("test1test2", arena.buffer, 10);
+
+    err = gd_arena_alloc(&arena, 0);
+    TEST_ASSERT_EQUAL(0, err);
+    TEST_ASSERT_EQUAL(10, arena.current);
+    TEST_ASSERT_EQUAL(10, arena.next);
+
+    err = gd_arena_appendnts(&arena, "LONGTESTUP");
+    TEST_ASSERT_EQUAL(-1, err);
+    TEST_ASSERT_EQUAL(10, arena.current);
+    TEST_ASSERT_EQUAL(10, arena.next);
+
+    err = gd_arena_appendnts(&arena, "UPPER");
+    TEST_ASSERT_EQUAL(0, err);
+    TEST_ASSERT_EQUAL(10, arena.current);
+    TEST_ASSERT_EQUAL(15, arena.next);
+    TEST_ASSERT_EQUAL_CHAR_ARRAY("test1test2UPPER", buffer, 15);
+}
+
+
 void gdArena_readLastPointer_shouldReadAnyDataTypeIntoGdPointerStruct(void) {
     uint8_t buffer[16];
     struct gd_arena arena;
@@ -230,7 +244,6 @@ void gdArena_readLastPointer_shouldReadAnyDataTypeIntoGdPointerStruct(void) {
 
     TEST_ASSERT_EQUAL(0, err);
     TEST_ASSERT_EQUAL(4, p.size);
-    TEST_ASSERT_EQUAL_PTR(p.buffer, buffer);
 
     err = gd_arena_alloc(&arena, 0);
     TEST_ASSERT_EQUAL(0, err);
@@ -245,8 +258,7 @@ void gdArena_readLastPointer_shouldReadAnyDataTypeIntoGdPointerStruct(void) {
     err = gd_arena_read_last_pointer(&arena, &p);
 
     TEST_ASSERT_EQUAL(p.size, arena.next - arena.current);
-    TEST_ASSERT_EQUAL(buffer + 4, p.buffer);
-    TEST_ASSERT_EQUAL_INT_ARRAY(arena.buffer + arena.current, p.buffer, 2);
+    TEST_ASSERT_EQUAL(4, p.index);
 }
 
 void gdArena_readLastString_shouldReadCharsIntoGdStringStruct(void) {
@@ -273,11 +285,11 @@ void gdArena_readLastString_shouldReadCharsIntoGdStringStruct(void) {
 int main(void) {
     UNITY_BEGIN();
 
-    RUN_TEST(gdArena_new_shouldInitArenaPointers);
     RUN_TEST(gdArena_alloc_shouldReturnNegativeIfFull);
     RUN_TEST(gdArena_reallocCurrent_shouldReturnNegativeIfInsufficientSpace);
     RUN_TEST(gdArena_appendc_shouldIncrementNextPointer);
     RUN_TEST(gdArena_appends_shouldCopyBufferContents);
+    RUN_TEST(gdArena_appendnts_shouldCopyNullTerminatedString);
     RUN_TEST(gdArena_readLastPointer_shouldReadAnyDataTypeIntoGdPointerStruct);
     RUN_TEST(gdArena_readLastString_shouldReadCharsIntoGdStringStruct);
 

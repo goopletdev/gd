@@ -47,7 +47,7 @@ int gd_arena_appendc(struct gd_arena *a, uint8_t c) {
     return 0;
 }
 
-int gd_arena_appends(struct gd_arena *a, void *ptr, size_t s) {
+int gd_arena_appends(struct gd_arena *a, const void *ptr, size_t s) {
     if ((a->next + s) > (a->max + 1)) {
         return -1;
     }
@@ -56,12 +56,24 @@ int gd_arena_appends(struct gd_arena *a, void *ptr, size_t s) {
     return 0;
 }
 
+int gd_arena_appendnts(struct gd_arena *a, const char *ptr) {
+    struct gd_arena temp = *a;
+    uint8_t c;
+    while ((c = *ptr++) != '\0') {
+        if (gd_arena_appendc(&temp, c) != 0) {
+            return -1;
+        }
+    }
+    *a = temp;
+    return 0;
+}
+
 int gd_arena_read_last_pointer(struct gd_arena *a, struct gd_pointer *p) {
     size_t size = a->next - a->current;
     if (size == 0) {
         return -1;
     }
-    p->buffer = a->buffer + a->current;
+    p->index = a->current;
     p->size = size;
     return 0;
 }

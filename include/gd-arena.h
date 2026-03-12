@@ -63,7 +63,15 @@ int gd_arena_appendc(struct gd_arena *a, uint8_t c);
  *  0 on success
  *  -1 if insufficient space in arena
  */
-int gd_arena_appends(struct gd_arena *a, void *ptr, size_t s);
+int gd_arena_appends(struct gd_arena *a, const void *ptr, size_t s);
+
+/**
+ * appends contents of null-terminated buffer of member size s
+ * @return
+ *  0 on success
+ *  -1 if insufficient space in arena, resets arena size, current and max
+ */
+int gd_arena_appendnts(struct gd_arena *a, const char *ptr);
 
 /** 
  * Reads a->current and (a->next - a->current) into p
